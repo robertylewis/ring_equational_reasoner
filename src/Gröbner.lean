@@ -184,41 +184,7 @@ instance decidable_is0: decidable P.is0 := by unfold is0; apply_instance
 def is_const := lead_mono P = 1
 instance decidable_is_const: decidable P.is_const := by unfold is_const; apply_instance
 
---This is ridiculous!
-instance rbnode_eq{X}[eqX: decidable_eq X]: decidable_eq(rbnode X)
-| rbnode.leaf rbnode.leaf := is_true rfl
-| (rbnode.red_node l1 v1 r1) (rbnode.red_node l2 v2 r2) :=
-	match eqX v1 v2 with
-	| is_false v := is_false(by{by_contra a, injection a, contradiction})
-	| is_true v :=
-		match rbnode_eq l1 l2 with
-		| is_false l := is_false(by{by_contra a, injection a, contradiction})
-		| is_true l :=
-			match rbnode_eq r1 r2 with
-			| is_false r := is_false(by{by_contra a, injection a, contradiction})
-			| is_true r := is_true(by rw[l,v,r])
-			end
-		end
-	end
-| (rbnode.black_node l1 v1 r1) (rbnode.black_node l2 v2 r2) :=
-	match eqX v1 v2 with
-	| is_false v := is_false(by{by_contra a, injection a, contradiction})
-	| is_true v :=
-		match rbnode_eq l1 l2 with
-		| is_false l := is_false(by{by_contra a, injection a, contradiction})
-		| is_true l :=
-			match rbnode_eq r1 r2 with
-			| is_false r := is_false(by{by_contra a, injection a, contradiction})
-			| is_true r := is_true(by rw[l,v,r])
-			end
-		end
-	end
-| rbnode.leaf (rbnode.red_node l1 v1 r1) := is_false(by by_contra; injection a)
-| rbnode.leaf (rbnode.black_node l1 v1 r1) := is_false(by by_contra; injection a)
-| (rbnode.red_node l1 v1 r1) rbnode.leaf := is_false(by by_contra; injection a)
-| (rbnode.red_node l1 v1 r1) (rbnode.black_node l2 v2 r2) := is_false(by by_contra; injection a)
-| (rbnode.black_node l1 v1 r1) rbnode.leaf := is_false(by by_contra; injection a)
-| (rbnode.black_node l1 v1 r1) (rbnode.red_node l2 v2 r2) := is_false(by by_contra; injection a)
+attribute [derive decidable_eq] rbnode
 
 instance[mo]: decidable_eq(poly K) := by apply_instance
 instance[mo]: inhabited(poly K) := ⟨0⟩
