@@ -12,8 +12,6 @@ infixl ` @₁`:99 := flip
 infixl ` @₂`:99 := flip_over_2
 infixr ` ∘₂ `:80 := (∘)∘(∘)
 
-instance decidable_bool {b:bool} : decidable b := by {cases b, apply is_false, simp, apply is_true, simp}
-
 instance {X} : monoid (list X) := {
 	one := [],
 	mul := (++),
