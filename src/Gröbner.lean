@@ -1,6 +1,5 @@
-import group_theory.coset ring_theory.ideals algebra.gcd_domain algebra.euclidean_domain
-  data.int.modeq group_theory.quotient_group data.equiv.algebra group_theory.subgroup tactic.ring
-	tactic.fin_cases tactic.tidy data.mv_polynomial
+import group_theory.coset ring_theory.ideals data.int.modeq group_theory.quotient_group
+       tactic.fin_cases tactic.tidy data.mv_polynomial
 
 open tactic prod native environment interactive lean.parser ideal classical lattice declaration rbtree
 infixl ` ⬝ ` := has_mul.mul
