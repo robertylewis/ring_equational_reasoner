@@ -1,5 +1,5 @@
 import group_theory.coset ring_theory.ideals data.int.modeq group_theory.quotient_group
-       tactic.fin_cases tactic.tidy data.mv_polynomial
+       tactic.fin_cases tactic.tidy data.mv_polynomial tactic.find
 
 open tactic prod native environment interactive lean.parser ideal classical lattice declaration rbtree
 local infixl ` ⬝ ` := has_mul.mul
@@ -135,23 +135,23 @@ end monomial
 --–Polynomials (this ended up essentially reimplementing very basics of rbmap equivalently, because I didn't find rbmap early enough)
 --Reverse order to have the leading term first.
 def poly.less [mo] {K} (x y : K×monomial) := monomial.order.lt y.snd x.snd
-def poly[mo] (K)[ring K] := rbtree (K×monomial) poly.less
+def poly [mo] (K) [ring K] := rbtree (K×monomial) poly.less
 
 namespace poly
 --K ∈ Type 0 because otherwise combination with tactics gets problematic.
 variables {K: Type} [ring K] [decidable_eq K] [o:mo] (P R : poly K)
 
-instance[mo] : has_lt monomial := ⟨monomial.order.lt⟩
-instance[mo] : has_le monomial := ⟨ n m ↦ ¬n>m ⟩
-instance decidable_lt[mo] : @decidable_rel monomial (<) := monomial.order.decidable
-instance decidable_le[mo] : @decidable_rel monomial (≤) := by apply_instance
-instance decidable_less: decidable_rel (@less o K) := _ _↦ by unfold less; apply_instance
+instance [mo] : has_lt monomial := ⟨monomial.order.lt⟩
+instance [mo] : has_le monomial := ⟨ n m ↦ ¬n>m ⟩
+instance decidable_lt [mo] : @decidable_rel monomial (<) := monomial.order.decidable
+instance decidable_le [mo] : @decidable_rel monomial (≤) := by apply_instance
+instance decidable_less : decidable_rel (@less o K) := _ _↦ by unfold less; apply_instance
 
 def coef (m) := ((P.find (0,m)).get_or_else (0,m)).fst
 --Value 0 should not be inserted, but rbtree lacks removal rutines. Since full simplification will rebuild a polynomial from scratch, extra zeros should not add up too badly.
 def update (m) (f: K→K) : poly K := let k := f (coef P m) in P.insert (k,m)
 
-def monom[mo] (m) : poly K := rbtree_of[m]less
+def monom [mo] (m) : poly K := rbtree_of[m]less
 instance[mo] : has_coe monomial (poly K) := ⟨ m↦ monom (1,m) ⟩
 
 --Let f' = (f; 0↦id). Then combine@₂f maps Σ pⱼ⬝mⱼ and Σ rⱼ⬝mⱼ to Σ f' pⱼ rⱼ ⬝ mⱼ (...assuming unsoundly that there's no explicit 0 coefficients...exact behavior depends on what the representation happens to be).
@@ -455,8 +455,6 @@ example (_: x⬝y² = x+y) (_: x²⬝y = x+1) : y = x² := by ringa
 example (_: z⬝x=y) (_: y=x²) (_: v²=2) : x⬝(2⬝z-x-x) = 0 := by ringa
 example (_: x²⬝y = x²) (_: x⬝y² = y²) : (x+y)⬝(x-y) + x² = x^3 := by ringa
 
-.
-#exit
 
 --Iteration tests
 example (_: x=y) : x⬝f(2⬝x² - y²) - y⬝f(x⬝y) = 0 := by ringa
